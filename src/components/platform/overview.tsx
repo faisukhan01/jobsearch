@@ -1,11 +1,14 @@
 "use client";
 
+import * as React from "react";
 import { usePlatform, label } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { MomentumChart } from "@/components/platform/chart";
 import { MatchRing, PlatformBadge, timeAgo, formatMoney, ACTIVITY_ICONS } from "./shared";
@@ -16,7 +19,7 @@ import {
 } from "lucide-react";
 
 export function Overview() {
-  const { stats, config, toggleAutopilot, runAutopilotNow, ticking, quickApply, setSection } = usePlatform();
+  const { stats, config, toggleAutopilot, runAutopilotNow, ticking, quickApply, setSection, updateConfig } = usePlatform();
   if (!stats || !config) return null;
 
   const budgetPct = Math.min(100, Math.round((config.appliedToday / Math.max(1, config.dailyLimit)) * 100));
@@ -67,9 +70,13 @@ export function Overview() {
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <PrefChip icon={Filter} text={`Min ${config.minMatchScore}% match`} />
+              <TuneChip icon={Filter} label="Minimum match score" text={`Min ${config.minMatchScore}% match`}
+                value={[config.minMatchScore]} min={0} max={100} step={5} format={(v) => `${v}%`}
+                onCommit={(v) => updateConfig({ minMatchScore: v })} />
               <PrefChip icon={Globe} text={config.remoteOnly ? "Remote only" : "Any location"} />
-              <PrefChip icon={DollarSign} text={`$${Math.round(config.minSalary / 1000)}k+ salary`} />
+              <TuneChip icon={DollarSign} label="Minimum salary" text={`$${Math.round(config.minSalary / 1000)}k+ salary`}
+                value={[config.minSalary]} min={0} max={300000} step={10000} format={(v) => `$${Math.round(v / 1000)}k+`}
+                onCommit={(v) => updateConfig({ minSalary: v })} />
               <PrefChip icon={Zap} text={config.autoTailor ? "AI tailoring ON" : "AI tailoring off"} />
             </div>
 
@@ -210,6 +217,31 @@ function PrefChip({ icon: Icon, text }: { icon: React.ElementType; text: string 
     <span className="inline-flex items-center gap-1.5 rounded-md border border-white/5 bg-white/5 px-2 py-1.5 text-[11px] text-zinc-300">
       <Icon className="h-3 w-3 text-zinc-500" /> {text}
     </span>
+  );
+}
+
+function TuneChip({ icon: Icon, label, text, value, min, max, step, format, onCommit }: {
+  icon: React.ElementType; label: string; text: string; value: number[]; min: number; max: number; step: number;
+  format: (v: number) => string; onCommit: (v: number) => void;
+}) {
+  const [draft, setDraft] = React.useState<number[]>(value);
+  React.useEffect(() => setDraft(value), [value[0]]);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" aria-label={`Tune ${label}`}
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-white/5 bg-white/5 px-2 py-1.5 text-left text-[11px] text-zinc-300 transition-colors hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-200">
+          <Icon className="h-3 w-3 text-zinc-500" /> {text}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 border-white/10 bg-zinc-950/95 p-3" align="start">
+        <p className="mb-2 text-xs font-medium text-zinc-300">{label}</p>
+        <Slider value={draft} min={min} max={max} step={step}
+          onValueChange={setDraft} onValueCommit={(v) => onCommit(v[0])}
+          aria-label={label} />
+        <p className="mt-2 text-center text-sm font-semibold tabular-nums text-emerald-300">{format(draft[0])}</p>
+      </PopoverContent>
+    </Popover>
   );
 }
 

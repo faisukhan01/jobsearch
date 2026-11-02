@@ -5,7 +5,7 @@
     "": {
       "name": "realtime-service",
       "dependencies": {
-        "socket.io": "^4.8.4",
+        "socket.io": "^4.8.1",
       },
     },
   },

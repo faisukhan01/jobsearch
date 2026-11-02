@@ -1,0 +1,75 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JobPilot — Autonomous Job Application Platform">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#09090b"/>
+      <stop offset="0.55" stop-color="#0c1210"/>
+      <stop offset="1" stop-color="#09090b"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="180" cy="40" rx="420" ry="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d399" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="1050" cy="270" rx="420" ry="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#6ee7b7"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M 44 0 L 0 0 0 44" fill="none" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="300" fill="url(#bg)"/>
+  <rect width="1200" height="300" fill="url(#grid)"/>
+  <rect width="1200" height="300" fill="url(#glow1)"/>
+  <rect width="1200" height="300" fill="url(#glow2)"/>
+  <rect x="0.5" y="0.5" width="1199" height="299" stroke="#ffffff" stroke-opacity="0.08"/>
+
+  <!-- logo mark -->
+  <g transform="translate(96 92)">
+    <rect width="116" height="116" rx="28" fill="url(#mark)"/>
+    <rect width="116" height="116" rx="28" stroke="#ffffff" stroke-opacity="0.25"/>
+    <g transform="translate(28 24)">
+      <path d="M30 4 C 40 14, 44 30, 40 46 L 20 46 C 16 30, 20 14, 30 4 Z" fill="#0a0a0b"/>
+      <circle cx="30" cy="26" r="6" fill="#6ee7b7"/>
+      <path d="M20 40 L 10 52 L 22 48 Z" fill="#0a0a0b"/>
+      <path d="M40 40 L 50 52 L 38 48 Z" fill="#0a0a0b"/>
+      <path d="M26 46 L 30 60 L 34 46 Z" fill="#0a0a0b" fill-opacity="0.85"/>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <text x="248" y="132" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="58" font-weight="800" fill="#fafafa" letter-spacing="-1.5">JobPilot</text>
+  <text x="250" y="170" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="21" font-weight="500" fill="#a1a1aa" letter-spacing="0.5">Autonomous Job Application Platform</text>
+
+  <!-- feature pills -->
+  <g font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="15" font-weight="600">
+    <rect x="250" y="196" width="128" height="34" rx="17" fill="#34d399" fill-opacity="0.1" stroke="#34d399" stroke-opacity="0.35"/>
+    <text x="314" y="218" text-anchor="middle" fill="#6ee7b7">Auto-Apply</text>
+
+    <rect x="390" y="196" width="128" height="34" rx="17" fill="#8b5cf6" fill-opacity="0.1" stroke="#8b5cf6" stroke-opacity="0.35"/>
+    <text x="454" y="218" text-anchor="middle" fill="#c4b5fd">AI Tailoring</text>
+
+    <rect x="530" y="196" width="128" height="34" rx="17" fill="#f59e0b" fill-opacity="0.1" stroke="#f59e0b" stroke-opacity="0.35"/>
+    <text x="594" y="218" text-anchor="middle" fill="#fcd34d">6 Portals</text>
+
+    <rect x="670" y="196" width="146" height="34" rx="17" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.15"/>
+    <text x="743" y="218" text-anchor="middle" fill="#d4d4d8">Realtime Engine</text>
+  </g>
+
+  <!-- stack labels right -->
+  <g font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="14" fill="#71717a">
+    <text x="1092" y="96" text-anchor="end">Next.js 16 · TypeScript</text>
+    <text x="1092" y="124" text-anchor="end">Python · FastAPI</text>
+    <text x="1092" y="152" text-anchor="end">Socket.IO · Laravel 11</text>
+    <text x="1092" y="180" text-anchor="end">Prisma · SQLite</text>
+  </g>
+  <rect x="920" y="86" width="2" height="100" rx="1" fill="url(#accent)" fill-opacity="0.55"/>
+</svg>

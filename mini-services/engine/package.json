@@ -2,6 +2,6 @@
   "name": "jobsearch-engine",
   "version": "1.0.0",
   "scripts": {
-    "dev": ".venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    "dev": "bash -c '[ -x .venv/bin/uvicorn ] || (echo \"[engine] bootstrapping venv...\" && python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt); exec .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'"
   }
 }

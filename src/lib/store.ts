@@ -48,6 +48,7 @@ interface PlatformState {
   toggleConnectorAutoApply: (platform: string, value: boolean) => Promise<void>;
   updateConfig: (patch: Partial<AutomationConfig>) => Promise<void>;
   saveProfile: (p: Partial<Profile>) => Promise<boolean>;
+  importResume: (file: File) => Promise<{ ok: boolean; warnings?: string[] }>;
   generateDoc: (jobId: string, kind: string) => Promise<TailoredDocItem | null>;
   setRealtime: (s: PlatformState["realtime"]) => void;
   pushLiveActivity: (a: Activity) => void;
@@ -303,6 +304,30 @@ export const usePlatform = create<PlatformState>((set, get) => ({
     }
     toast.error("Could not save profile");
     return false;
+  },
+
+  importResume: async (file) => {
+    const t = toast.loading("Reading your resume…");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/resume/upload", { method: "POST", body });
+      const data = await res.json();
+      toast.dismiss(t);
+      if (res.ok) {
+        set({ profile: data.profile });
+        const n = data.profile?.skills?.length ?? 0;
+        toast.success(`Resume imported — ${n} skills, ${data.profile?.experienceYears ?? 0} yrs experience auto-filled`);
+        for (const w of (data.meta?.warnings ?? []).slice(0, 2)) toast.warning(w);
+        return { ok: true, warnings: data.meta?.warnings ?? [] };
+      }
+      toast.error(data.error ?? "Could not parse this resume");
+      return { ok: false };
+    } catch {
+      toast.dismiss(t);
+      toast.error("Upload failed — check your connection and try again");
+      return { ok: false };
+    }
   },
 
   generateDoc: async (jobId, kind) => {

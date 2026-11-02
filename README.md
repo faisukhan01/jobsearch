@@ -48,6 +48,7 @@ JobPilot is built the *honest* way:
 | 🔌 | **6 Portal Connectors** | Indeed · LinkedIn · Glassdoor · ZipRecruiter · Greenhouse · Lever — connect with your account email, per-portal auto-apply toggles, live sync stats |
 | 🧠 | **AI Match Scoring** | Weighted scoring (skills 40 · location 20 · salary 15 · recency 15 · easy-apply 10) computed by the Python engine for every listing |
 | ✍️ | **AI Document Studio** | GLM-4.5-air writes tailored cover letters, resume highlight bullets and recruiter outreach DMs per job — grounded in your live profile |
+| 📄 | **Resume Import** | Drop a PDF or Word resume — text extraction (unpdf/mammoth) + AI structured parsing auto-fills your entire profile: name, contacts, headline, summary, skills, experience, salary |
 | 📊 | **Mission Control** | Momentum chart (14-day), response rate, interview funnel, platform distribution, daily budget gauge — all live |
 | 🛰️ | **Realtime Event Bus** | Socket.IO streams every sync / application / AI generation to the dashboard the instant it happens |
 | 🗂️ | **Pipeline Board** | Queued → Applied → Screening → Interview → Offer → Rejected, with one-tap stage advancement and full application history |
@@ -165,6 +166,7 @@ sequenceDiagram
 | POST | `/api/automation/tick` | run one autopilot tick |
 | PATCH | `/api/connectors` | connect / disconnect portals, per-portal auto-apply |
 | GET/POST | `/api/ai` | AI cover letters · resume bullets · outreach DMs |
+| POST | `/api/resume/upload` | Resume import (PDF/DOCX) — extract + AI-parse + auto-fill profile |
 | GET | `/api/activity` | filterable event ledger |
 | GET | `/api/engine/health` | engine liveness probe |
 

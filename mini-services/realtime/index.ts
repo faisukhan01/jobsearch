@@ -177,6 +177,44 @@ io.on('connection', (socket: Socket) => {
 })
 
 // ---------------------------------------------------------------------------
+// Engine watchdog — the realtime bus is supervised by the platform driver, so
+// it is the perfect place to guarantee the FastAPI engine is always alive.
+// Every 30s: probe /health on :8000; if down, spawn the engine detached
+// (its dev script self-bootstraps the Python venv when missing).
+// ---------------------------------------------------------------------------
+const ENGINE_URL = 'http://localhost:8000/health'
+const ENGINE_DIR = '/home/z/my-project/mini-services/engine'
+let engineBootInProgress = false
+
+const ensureEngineAlive = async (): Promise<void> => {
+  if (engineBootInProgress) return
+  try {
+    const res = await fetch(ENGINE_URL, { signal: AbortSignal.timeout(4000) })
+    if (res.ok) return
+  } catch {
+    // engine down — fall through to respawn
+  }
+  engineBootInProgress = true
+  console.log('[watchdog] engine down — spawning detached engine process…')
+  try {
+    const proc = Bun.spawn(['bash', '-c', 'cd "$1" && bun run dev >> /tmp/engine.log 2>&1', 'watchdog', ENGINE_DIR], {
+      cwd: ENGINE_DIR,
+      stdin: 'ignore',
+      stdout: 'ignore',
+      stderr: 'ignore',
+    })
+    proc.unref()
+  } catch (error) {
+    console.error('[watchdog] failed to spawn engine:', error)
+  } finally {
+    setTimeout(() => { engineBootInProgress = false }, 20_000)
+  }
+}
+
+ensureEngineAlive()
+setInterval(() => { void ensureEngineAlive() }, 30_000)
+
+// ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
 httpServer.listen(PORT, () => {

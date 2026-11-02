@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { usePlatform } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,11 +12,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MatchRing, timeAgo } from "./shared";
-import { BrainCircuit, Check, Copy, FileText, Loader2, Plus, Sparkles, X } from "lucide-react";
+import { BrainCircuit, Check, Copy, FileText, Loader2, Plus, Sparkles, UploadCloud, X } from "lucide-react";
 import type { TailoredDocItem } from "@/lib/types";
+import type { Profile } from "@/lib/types";
+
+const RESUME_EXT = [".pdf", ".docx", ".doc"];
 
 export function Studio() {
-  const { profile, saveProfile, jobs, generateDoc } = usePlatform();
+  const { profile, saveProfile, importResume, jobs, generateDoc } = usePlatform();
 
   const [form, setForm] = useState({
     fullName: profile?.fullName ?? "",
@@ -31,6 +35,46 @@ export function Studio() {
   const [newSkill, setNewSkill] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+
+  // ── Resume import state ──────────────────────────────────────────
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [importedFile, setImportedFile] = useState<string | null>(profile?.resumeFileName ?? null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const applyProfileToForm = (p: Profile) => {
+    setForm({
+      fullName: p.fullName ?? "",
+      email: p.email ?? "",
+      phone: p.phone ?? "",
+      location: p.location ?? "Remote",
+      headline: p.headline ?? "",
+      summary: p.summary ?? "",
+      experienceYears: p.experienceYears ?? 0,
+      desiredSalary: p.desiredSalary ?? 0,
+    });
+    setSkills(p.skills ?? []);
+  };
+
+  const handleResumeFile = async (file: File) => {
+    const lower = file.name.toLowerCase();
+    if (!RESUME_EXT.some((e) => lower.endsWith(e))) {
+      toast.error("Only PDF or Word (.doc / .docx) resumes are supported");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Resume is too large — 8 MB maximum");
+      return;
+    }
+    setUploading(file.name);
+    const result = await importResume(file);
+    setUploading(null);
+    if (result.ok) {
+      const p = usePlatform.getState().profile;
+      if (p) applyProfileToForm(p);
+      setImportedFile(file.name);
+    }
+  };
 
   const [jobId, setJobId] = useState<string>("");
   const [doc, setDoc] = useState<TailoredDocItem | null>(null);
@@ -77,6 +121,54 @@ export function Studio() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3.5">
+          {/* ── Resume import dropzone ─────────────────────────────── */}
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Upload resume — PDF or Word"
+            onClick={() => !uploading && inputRef.current?.click()}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && !uploading && inputRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOver(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) void handleResumeFile(f);
+            }}
+            className={"cursor-pointer rounded-xl border border-dashed p-4 text-center transition-colors "
+              + (dragOver
+                ? "border-emerald-500/60 bg-emerald-500/10"
+                : "border-white/15 bg-black/20 hover:border-emerald-500/40 hover:bg-emerald-500/5")}>
+            <input ref={inputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" aria-hidden="true"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleResumeFile(f);
+                e.target.value = "";
+              }} />
+            {uploading ? (
+              <div className="flex items-center justify-center gap-2 text-sm text-emerald-300">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Reading {uploading} — extracting your data…
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-center gap-2 text-sm font-medium text-zinc-200">
+                  <UploadCloud className="h-4 w-4 text-emerald-400" />
+                  Import resume — PDF or Word
+                </div>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Drop it here or click to browse — AI fills every field below instantly
+                </p>
+              </>
+            )}
+          </div>
+          {importedFile && !uploading && (
+            <p className="flex items-center gap-1.5 text-[11px] text-emerald-400">
+              <Check className="h-3 w-3" /> Loaded from {importedFile} — review &amp; tweak below, then save.
+            </p>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Field label="Full name">
               <Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} className="h-9 bg-black/30 text-sm" />
